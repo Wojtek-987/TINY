@@ -23,7 +23,7 @@ It then waits for another command. This loop continues until the user enters the
 `TINY.exe` creates a `tiny.log` file every time you open the program. The log is saved in the same directory as `TINY.exe`. The logs contain all user-entered lines and TINY.exe responses ordered chronologically.
 
 ### Interpreting a `*.tiny` file:
-Go into the directory where TINY.exe is stored. Right-click and select 'Open in Terminal'. Type `TINY.exe your_filename.tiny`. `TINY.exe` will execute the file line-by-line and automatically all. It's like an automated typing in `TINY.tiny` code.
+Go into the directory where TINY.exe is stored. Right-click and select 'Open in Terminal'. Type `TINY.exe your_filename.tiny`. `TINY.exe` will execute the file line-by-line and automatically execute all. It's like an automated typing in `TINY.tiny` code.
 
 ---
 # TINY.tiny docs
