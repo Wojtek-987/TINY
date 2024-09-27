@@ -1,8 +1,9 @@
 #include <iostream>
 #include <string>
-#include "Language.h"
-#include "Tiny.h"
-#include "Colour.h"
+#include "types/OutputType.h"
+#include "types/Colour.h"
+#include "headers/Language.h"
+#include "headers/Tiny.h"
 
 using std::string;
 using std::cout;
@@ -96,7 +97,7 @@ void Tiny::prompt_input() {
     cout << ColourText::open(Colour::Blue) << this->name << ColourText::close() << " < ";
 }
 
-void Tiny::return_output(const string& value, const OutputType type) {
+void Tiny::return_output(const string& value, OutputType type) {
     cout << ColourText::open(Colour::Blue) << this->name << ColourText::close() << " > " << ColourText::open(Colour::Magenta) << value << ColourText::close() << endl;
     // \033[31m red for errors
     // \033[36m cyan for info

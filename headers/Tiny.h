@@ -1,7 +1,7 @@
 #ifndef TINY_H
 #define TINY_H
 
-#include "OutputType.h"
+#include "../types/OutputType.h"
 using std::string;
 
 class Tiny {

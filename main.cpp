@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
-#include "Language.h"
-#include "Tiny.h"
+#include "headers/Language.h"
+#include "headers/Tiny.h"
+#include "types/OutputType.h"
 
 
 using std::string;

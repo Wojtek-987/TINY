@@ -8,5 +8,5 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(TINY main.cpp
         Language.cpp
         Tiny.cpp
-        OutputType.h
-        Colour.h)
+        types/OutputType.h
+        types/Colour.h)
