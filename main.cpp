@@ -1,21 +1,39 @@
 #include <iostream>
+#include <string>
+#include "Language.h"
+#include "Tiny.h"
+
 
 using std::string;
 using std::cout;
 using std::cin;
 using std::endl;
 
-
+// add argument for *.tiny file line-by-line reading
 int main() {
-    bool is_running = true;
-    string user_command;
+    // Init interpreter
+    Tiny tiny;
 
-    while(is_running) {
-        cout << "\033[1m\033[34m" << "tiny" << "\033[0m" << " < ";
-        cin >> user_command;
-        cout << "\033[1m\033[34m" << "tiny" << "\033[0m" << " > " << "\033[35m" << "undefined: " << user_command << "\033[0m" << endl;
+    // Run the interpreter loop
+    while(tiny.is_active) {
+        string user_command;
+
+        tiny.prompt_input();
+
+        std::getline(std::cin, user_command);
+
+        // process user input
+        // generate output
+
+        bool is_clean = Language::is_clean(user_command);
+        string output = is_clean ? "true" : "false";
+
+        tiny.return_output(output, OutputType::Output);
+
+        // save logs to file
+
         if(user_command == "exit")
-            is_running = false;
+            tiny.is_active = false;
     }
 
     return 0;

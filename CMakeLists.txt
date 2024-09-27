@@ -5,4 +5,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(TINY main.cpp)
+add_executable(TINY main.cpp
+        Language.cpp
+        Tiny.cpp
+        OutputType.h
+        Colour.h)
