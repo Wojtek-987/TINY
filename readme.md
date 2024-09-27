@@ -33,7 +33,7 @@ The TINY.tiny programming language consists of a tiny set of valid characters - 
 ### Interpreter Commands (IC):
 `hello` - outputs `Hello, World!`
 
-
+`clear` - clears the memory of all variables and constants, clears the `tiny.log` file, and resets `last` to `0`
 
 `exit` - terminates the process
 
@@ -64,7 +64,7 @@ Simple math is valid syntax:
 ```
 6 + 2            // Valid: outputs '8'
 
-  6     +  2       // Valid: outputs '8'
+  6     +  2     // Valid: outputs '8'
 
 6+2              // Invalid: throws an error
   
@@ -170,4 +170,42 @@ Comments:
 ```
 comment this is a comment              // outputs 'comment'
 vint x = -8 comment variable creation  // throws an error
+```
+
+# Example `TINY.tiny` file:
+```
+comment TINY Program to Generate Fibonacci Sequence (Up to 5 Terms)
+
+comment Initialize the first two Fibonacci numbers
+vint a = 0
+vint b = 1
+
+comment Output the first two numbers
+a
+b
+
+comment Calculate the next number in the Fibonacci sequence: a + b
+a + b
+vint fib3 = last
+fib3
+
+comment Update values for the next step (b becomes the new a, fib3 becomes the new b)
+a = b
+b = fib3
+
+comment Calculate the next Fibonacci number
+a + b
+vint fib4 = last
+fib4
+
+comment Update values for the next step
+a = b
+b = fib4
+
+comment Calculate the next Fibonacci number
+a + b
+vint fib5 = last
+fib5
+
+comment The Fibonacci sequence up to 5 terms: 0, 1, 1, 2, 3
 ```
