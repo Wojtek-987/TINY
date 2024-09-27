@@ -172,6 +172,8 @@ comment this is a comment              // outputs 'comment'
 vint x = -8 comment variable creation  // throws an error
 ```
 
+---
+
 # Example `TINY.tiny` file:
 ```
 comment TINY Program to Generate Fibonacci Sequence (Up to 5 Terms)
