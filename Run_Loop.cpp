@@ -29,7 +29,7 @@ void run_io_loop(Tiny& tiny, const std::string& command = "") {
     const bool is_clean = Language::is_clean(user_command);
     const std::string output = is_clean ? "true" : "false";
 
-    // Show whether input is clean (debug)
+    // Show whether input is clean (debug) TEMP
     tiny.return_output(output, OutputType::Output);
 
     append_to_log("tiny > " + output, log_file_path, tiny);

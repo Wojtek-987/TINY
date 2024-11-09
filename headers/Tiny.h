@@ -20,7 +20,7 @@ private:
 
 public:
     bool is_running;
-    long long int last;
+    long long int last; // TEMP
 
     explicit Tiny(const string& interpreter_name = "tiny");
 
