@@ -7,7 +7,7 @@
 
 namespace fs = std::filesystem;
 
-// Define the functions
+
 
 std::string get_timestamp() {
     // Get current time
@@ -21,7 +21,7 @@ std::string get_timestamp() {
 }
 
 std::string create_log_file(Tiny& tiny) {
-    // Create logs folder & file name with timestamp
+    // Create logs folder and file name with timestamp
     const std::string folder = "logs";
     const std::string filename = "tiny-" + get_timestamp() + ".logs.txt";
 
@@ -44,11 +44,18 @@ std::string create_log_file(Tiny& tiny) {
 }
 
 void append_to_log(const std::string& line, const std::string& log_file_path, Tiny& tiny) {
-    // Open the log file in append mode
     if (std::ofstream log_file(log_file_path, std::ios::app); log_file.is_open()) {
         log_file << "[" + get_timestamp() + "]: " + line << std::endl;
         log_file.close();
     } else {
         tiny.return_output("Could not append to log file.", OutputType::Error);
+    }
+}
+
+void clear_log_file(const Tiny& tiny, const string& log_file) {
+    if (std::ofstream file(log_file, std::ios::trunc); file.is_open()) {
+        file << "[" + get_timestamp() + "]: " + "Log file initialized." << std::endl;
+        file.close();
+        tiny.return_output("Log file initialized.", OutputType::Info);
     }
 }

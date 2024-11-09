@@ -13,4 +13,10 @@ add_executable(TINY main.cpp
         headers/Logger.h
         Logger.cpp
         Run_Loop.cpp
-        headers/Run_Loop.h)
+        headers/Run_Loop.h
+        TokenQueue.cpp
+        headers/TokenQueue.h
+        types/Token.h
+        Tokenizer.cpp
+        headers/Tokenizer.h
+)

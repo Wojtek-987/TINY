@@ -2,33 +2,42 @@
 #define TINY_H
 
 #include "../types/OutputType.h"
+#include "TokenQueue.h"
+
+
 using std::string;
+
 
 class Tiny {
 private:
     string name;
 
-    void change_name(const string& new_name);
+    mutable TokenQueue queue;
 
     static void greet();
 
-    static string sterilize_input(const string& input_string);
+    void change_name(const string& new_name);
 
-    static void tokenize_input();
-
-    static void process_token_stack();
 
 public:
     bool is_running;
-    long long int last; // TEMP
+    long long int last;
 
     explicit Tiny(const string& interpreter_name = "tiny");
 
+    string get_name() const;
+
+    void prompt_input() const;
+
+    [[nodiscard]] string sterilize_input(const string& input_string) const;
+
+    void tokenize_input(const string& input) const;
+
+    void process_token_queue();
+
+    void return_output(const string& value, OutputType type) const;
+
     ~Tiny();
-
-    void prompt_input();
-
-    void return_output(const string& value, OutputType type);
 };
 
 #endif

@@ -79,7 +79,7 @@ Creating a variables and constants:
 
 - variable and constant names have to contain only valid lowercase letters
 - variables and constants must be assigned an initial value
-- variables have to conform to the min and max values of `-2,147,483,648` to `2,147,483,647`
+- variables and constants have to conform to the min and max values of `-2,147,483,648` to `2,147,483,647`
 ```
 // Variable:
 vint foo = 5   // outputs 'foo = 5'
@@ -123,7 +123,7 @@ delete last  // throws an error
 vint last    // throws an error
 ```
 
-Renaming the variables and constants:
+Renaming variables and constants:
 ```
 foo = foobar // outputs 'foo -> foobar = -3'
 bar = tiny   // outputs 'bar -> tiny: 1'

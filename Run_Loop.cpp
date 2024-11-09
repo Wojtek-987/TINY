@@ -9,8 +9,8 @@
 
 namespace fs = std::filesystem;
 
-void run_io_loop(Tiny& tiny, const std::string& command = "") {
-    std::string user_command = command;
+void run_io_loop(Tiny& tiny, const string& command = "") {
+    string user_command = tiny.sterilize_input(command);
 
     tiny.prompt_input();
     if (command.empty()) {
@@ -21,24 +21,27 @@ void run_io_loop(Tiny& tiny, const std::string& command = "") {
         std::cout << command << std::endl;
     }
 
-    append_to_log("tiny < " + command, log_file_path, tiny);
+    append_to_log(tiny.get_name() + " < " + command, log_file_path, tiny);
 
     // Process user input
+    tiny.tokenize_input(user_command);
+
     // Generate output
+    tiny.process_token_queue();
 
     const bool is_clean = Language::is_clean(user_command);
-    const std::string output = is_clean ? "true" : "false";
+    const string output = is_clean ? "true" : "false";
 
     // Show whether input is clean (debug) TEMP
     tiny.return_output(output, OutputType::Output);
 
-    append_to_log("tiny > " + output, log_file_path, tiny);
+    append_to_log(tiny.get_name() + " > " + output, log_file_path, tiny);
 
-    if (user_command == "exit")
+    if (user_command == "exit") // TEMP
         tiny.is_running = false;
 }
 
-void run_file(const std::string& path, Tiny& tiny) {
+void run_file(const string& path, Tiny& tiny) {
     // Check if the path exists, is a regular file, and has the ".tiny" extension
     if (const fs::path file_path = path; exists(file_path) && is_regular_file(file_path) && file_path.extension() == ".tiny") {
         std::ifstream file(path);
@@ -49,7 +52,7 @@ void run_file(const std::string& path, Tiny& tiny) {
         }
 
         // Run run_io_loop for all lines
-        std::string line;
+        string line;
         while (std::getline(file, line)) {
             run_io_loop(tiny, line);
         }
