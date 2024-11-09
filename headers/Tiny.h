@@ -19,7 +19,8 @@ private:
     static void process_token_stack();
 
 public:
-    bool is_active;
+    bool is_running;
+    long long int last;
 
     explicit Tiny(const string& interpreter_name = "tiny");
 

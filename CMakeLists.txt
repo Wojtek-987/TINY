@@ -9,4 +9,8 @@ add_executable(TINY main.cpp
         Language.cpp
         Tiny.cpp
         types/OutputType.h
-        types/Colour.h)
+        types/Colour.h
+        headers/Logger.h
+        Logger.cpp
+        Run_Loop.cpp
+        headers/Run_Loop.h)

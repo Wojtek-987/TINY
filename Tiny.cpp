@@ -16,11 +16,14 @@ public:
     static string open(const Colour& colour) {
         if (colour == Colour::Blue) {
             return "\033[1m\033[34m";
-        } else if (colour == Colour::Magenta) {
+        }
+        if (colour == Colour::Magenta) {
             return "\033[35m";
-        } else if (colour == Colour::Red) {
+        }
+        if (colour == Colour::Red) {
             return "\033[31m";
-        } else if (colour == Colour::Cyan) {
+        }
+        if (colour == Colour::Cyan) {
             return "\033[36m";
         }
 
@@ -50,22 +53,22 @@ string Tiny::sterilize_input(const string& input_string) {
     string sterilized_input;
 
     // Clear multiple spaces
-    for(unsigned long long i = 0; i < length - 1; i++) {
+    for (unsigned long long i = 0; i < length - 1; i++) {
 
-        if(input_string[i] == ' ') {
+        if (input_string[i] == ' ') {
             sterilized_input += ' ';
-            while(input_string[i] == ' ') {
+            while (input_string[i] == ' ') {
                 i++;
             }
         }
     }
 
-    if(!sterilized_input.empty()) {
+    if (!sterilized_input.empty()) {
         // Trim spaces from the beginning and end
-        if(sterilized_input[0] == ' ') {
+        if (sterilized_input[0] == ' ') {
             // dropLeft(1)
         }
-        if(sterilized_input[sterilized_input.length() - 1] == ' ') {
+        if (sterilized_input[sterilized_input.length() - 1] == ' ') {
             // dropRight(1)
         }
     }
@@ -84,21 +87,35 @@ void Tiny::process_token_stack() {
 
 Tiny::Tiny(const string& interpreter_name) {
     name = interpreter_name;
-    is_active = true;
+    is_running = true;
+    last = 0;
     greet();
 }
 
 Tiny::~Tiny() {
-    is_active = false;
-    cout << "Goodbye!";
+    is_running = false;
+    cout << "Goodbye!" << endl;
 }
 
 void Tiny::prompt_input() {
     cout << ColourText::open(Colour::Blue) << this->name << ColourText::close() << " < ";
 }
 
-void Tiny::return_output(const string& value, OutputType type) {
-    cout << ColourText::open(Colour::Blue) << this->name << ColourText::close() << " > " << ColourText::open(Colour::Magenta) << value << ColourText::close() << endl;
-    // \033[31m red for errors
-    // \033[36m cyan for info
+void Tiny::return_output(const string& value, const OutputType type) {
+
+    Colour colour;
+
+    switch (type) {
+        case OutputType::Output:
+            colour = Colour::Magenta;
+        break;
+        case OutputType::Error:
+            colour = Colour::Red;
+        break;
+        case OutputType::Info:
+            colour = Colour::Cyan;
+        break;
+    }
+
+    cout << ColourText::open(Colour::Blue) << this->name << ColourText::close() << " > " << ColourText::open(colour) << value << ColourText::close() << endl;
 }

@@ -4,7 +4,7 @@ const string Language::valid_chars = "abcdefghijklmnopqrstuvwxyz0123456789+-*/= 
 
 bool Language::is_clean(const string& line) {
     const unsigned long long line_length = line.length();
-    const int valid_chars_length = valid_chars.length();
+    const unsigned int valid_chars_length = valid_chars.length();
 
     // Check if all characters are valid
     for (unsigned long long i = 0; i < line_length; i++) {
