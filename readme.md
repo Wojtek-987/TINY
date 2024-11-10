@@ -55,7 +55,7 @@ The language permits loose whitespace unless it interferes with a declaration or
 If the user enters a IC, the line should not contain any other tokens:
 
 ```
-hello     // Valid: outputs 'Hello, World!'
+hello     // Valid: outputs 'hello world!'
 hello 42  // Invalid: throws 'Unexpected token: 42'
 ```
 
@@ -77,7 +77,7 @@ Simple math is valid syntax:
 
 ---
 
-Creating a variables and constants:
+Creating variables and constants:
 
 - variable and constant names have to contain only valid lowercase letters
 - variables and constants must be assigned an initial value
@@ -118,8 +118,8 @@ last         // outputs '1'
 foo = last   // outputs 'foo = 1'
 
 last         // outputs '1'
-last = 5     // outputs 'last = 5'
-last         // outputs '5'
+last = 5     // throws an error
+last         // outputs '1'
 
 delete last  // throws an error
 vint last    // throws an error
