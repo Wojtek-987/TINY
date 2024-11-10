@@ -2,15 +2,13 @@
 #define TOKENIZER_H
 
 #include "TokenQueue.h"
-#include <string>
 
 class Tokenizer {
 public:
-    explicit Tokenizer(TokenQueue& queue);
-    void tokenize(const std::string& line) const;
+    static TokenQueue queue;
+    static void tokenize(const std::string& line) ;
 
 private:
-    TokenQueue& queue;
     static TokenType identifyTokenType(const std::string& token);
 };
 

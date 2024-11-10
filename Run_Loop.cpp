@@ -1,13 +1,14 @@
 #include "headers/Run_Loop.h"
 #include "headers/Logger.h"
-#include "headers/Language.h"
 #include "headers/Tiny.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <filesystem>
 
+
 namespace fs = std::filesystem;
+
 
 void run_io_loop(const Tiny& tiny, const string& command = "") {
     string user_command = tiny.sterilize_input(command);
@@ -21,24 +22,14 @@ void run_io_loop(const Tiny& tiny, const string& command = "") {
         std::cout << command << std::endl;
     }
 
-    append_to_log(tiny, tiny.get_name() + " < " + command, log_file_path);
+    append_to_log(tiny, tiny.get_name() + " < " + user_command, log_file_path);
 
     // Process user input
     tiny.tokenize_input(user_command);
 
     // Generate output
-    tiny.process_token_queue();
-
-    const bool is_clean = Language::is_clean(user_command);
-    const string output = is_clean ? "true" : "false";
-
-    // Show whether input is clean (debug) TEMP
-    tiny.return_output(output, OutputType::Output);
-
-    append_to_log(tiny, tiny.get_name() + " > " + output, log_file_path);
-
-    if (user_command == "exit") // TEMP
-        tiny.is_running = false;
+    if (const string output = tiny.process_token_queue(); output != "Cleared")
+        append_to_log(tiny, tiny.get_name() + " > " + output, log_file_path);
 }
 
 void run_file(const Tiny& tiny, const string& path) {

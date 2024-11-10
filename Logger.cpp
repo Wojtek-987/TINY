@@ -7,9 +7,9 @@
 
 namespace fs = std::filesystem;
 
+using std::string;
 
-
-std::string get_timestamp() {
+string get_timestamp() {
     // Get current time
     const auto now = std::chrono::system_clock::now();
     const auto in_time_t = std::chrono::system_clock::to_time_t(now);
@@ -20,16 +20,16 @@ std::string get_timestamp() {
     return ss.str();
 }
 
-std::string create_log_file(const Tiny& tiny) {
+string create_log_file(const Tiny& tiny) {
     // Create logs folder and file name with timestamp
-    const std::string folder = "logs";
-    const std::string filename = "tiny-" + get_timestamp() + ".logs.txt";
+    const string folder = "logs";
+    const string filename = "tiny-" + get_timestamp() + ".logs.txt";
 
     if (!fs::exists(folder)) {
         fs::create_directory(folder);
     }
 
-    const std::string log_file_path = folder + "/" + filename;
+    const string log_file_path = folder + "/" + filename;
 
     // Create and open the file
     if (std::ofstream log_file(log_file_path); log_file.is_open()) {
@@ -43,7 +43,7 @@ std::string create_log_file(const Tiny& tiny) {
     return log_file_path;
 }
 
-void append_to_log(const Tiny& tiny, const std::string& line, const std::string& log_file_path) {
+void append_to_log(const Tiny& tiny, const string& line, const string& log_file_path) {
     if (std::ofstream log_file(log_file_path, std::ios::app); log_file.is_open()) {
         log_file << "[" + get_timestamp() + "]: " + line << std::endl;
         log_file.close();
@@ -52,10 +52,11 @@ void append_to_log(const Tiny& tiny, const std::string& line, const std::string&
     }
 }
 
-void clear_log_file(const Tiny& tiny, const string& log_file) {
+bool clear_log_file(const Tiny& tiny, const string& log_file) {
     if (std::ofstream file(log_file, std::ios::trunc); file.is_open()) {
         file << "[" + get_timestamp() + "]: " + "Log file initialized." << std::endl;
         file.close();
-        tiny.return_output("Log file initialized.", OutputType::Info);
+        return true;
     }
+    return false;
 }

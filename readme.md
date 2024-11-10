@@ -31,9 +31,9 @@ The TINY.tiny programming language consists of a tiny set of valid characters - 
 
 ## Command list:
 ### Interpreter Commands (IC):
-`hello` - outputs `Hello, World!`
+`hello` - outputs `hello world!`
 
-`clear` - clears the memory of all variables and constants, clears the `tiny.log` file, and resets `last` to `0`
+`clear` - clears the memory of all variables and constants, clears the `tiny-<time_stamp>.log.txt` file, and resets `last` to `0`
 
 `exit` - terminates the process
 
@@ -44,9 +44,9 @@ The language permits loose whitespace unless it interferes with a declaration or
 
 ```
 
-  rename     foo  // Valid: renames the interpreter to 'foo'
+  vint     foo  =    6  // Valid: creates a variable named `foo` and assigns it the value `6`
 
-  re name f oo    // Invalid: throws a syntax error
+  vi nt f oo    // Invalid: throws a syntax error
 
 ```
 
@@ -56,7 +56,7 @@ If the user enters a IC, the line should not contain any other tokens:
 
 ```
 hello     // Valid: outputs 'Hello, World!'
-hello 42  // Invalid: throws an error
+hello 42  // Invalid: throws 'Unexpected token: 42'
 ```
 
 ---

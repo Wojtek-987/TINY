@@ -3,12 +3,13 @@
 #include <sstream>
 #include <unordered_set>
 #include <cctype>
+#include <iostream>
 
 using std::string;
 
-Tokenizer::Tokenizer(TokenQueue& queue) : queue(queue) {}
+TokenQueue Tokenizer::queue;
 
-void Tokenizer::tokenize(const string& line) const {
+void Tokenizer::tokenize(const string& line) {
     std::istringstream stream(line);
     string token;
 
@@ -16,6 +17,8 @@ void Tokenizer::tokenize(const string& line) const {
     while (stream >> token) {
         const TokenType type = identifyTokenType(token);
         queue.push(Token(type, token));
+        // Output tokens for debug
+        // std::cout << "Token added: " << token << ", Type: " << static_cast<int>(type) << std::endl;
     }
 }
 
