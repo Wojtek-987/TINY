@@ -27,7 +27,7 @@ Go into the directory where TINY.exe is stored. Right-click and select 'Open in 
 
 ---
 # TINY.tiny docs
-The TINY.tiny programming language consists of a tiny set of valid characters - 43: numbers, lowercase letters of the English alphabet, and the following symbols: "+-*/= " ([space] included).
+The TINY.tiny programming language consists of a tiny set of valid characters - 43: digits, lowercase letters of the English alphabet, and the following symbols: "+-*/= " ([space] included).
 
 ## Command list:
 ### Interpreter Commands (IC):
