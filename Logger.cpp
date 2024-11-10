@@ -20,7 +20,7 @@ std::string get_timestamp() {
     return ss.str();
 }
 
-std::string create_log_file(Tiny& tiny) {
+std::string create_log_file(const Tiny& tiny) {
     // Create logs folder and file name with timestamp
     const std::string folder = "logs";
     const std::string filename = "tiny-" + get_timestamp() + ".logs.txt";
@@ -43,7 +43,7 @@ std::string create_log_file(Tiny& tiny) {
     return log_file_path;
 }
 
-void append_to_log(const std::string& line, const std::string& log_file_path, Tiny& tiny) {
+void append_to_log(const Tiny& tiny, const std::string& line, const std::string& log_file_path) {
     if (std::ofstream log_file(log_file_path, std::ios::app); log_file.is_open()) {
         log_file << "[" + get_timestamp() + "]: " + line << std::endl;
         log_file.close();

@@ -37,6 +37,8 @@ The TINY.tiny programming language consists of a tiny set of valid characters - 
 
 `exit` - terminates the process
 
+`help` - opens the browser with an online reference to docs for language usage and compiler docs
+
 ### Syntax:
 The language permits loose whitespace unless it interferes with a declaration or produces an invalid token:
 

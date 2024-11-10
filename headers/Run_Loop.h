@@ -6,10 +6,10 @@
 
 class Tiny;
 
-void run_io_loop(Tiny& tiny, const std::string& command);
-void run_file(const std::string& path, Tiny& tiny);
+void run_io_loop(const Tiny& tiny, const std::string& command);
+void run_file(const Tiny& tiny, const std::string& path);
 
 extern std::string log_file_path;
-void append_to_log(const std::string& line, const std::string& log_file_path, Tiny& tiny);
+void append_to_log(const Tiny& tiny, const std::string& line, const std::string& log_file_path);
 
 #endif //RUN_LOOP_H

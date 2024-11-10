@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 
 // Init interpreter globally
-Tiny tiny;
+const Tiny tiny;
 
 string log_file_path = create_log_file(tiny);
 
@@ -33,7 +33,7 @@ int main(const int argc, char* argv[]) {
 
     // Run a file (optional)
     if (!file_path.empty()) {
-        run_file(file_path, tiny);
+        run_file(tiny, file_path);
 
         // If user wants to terminate the interpreter process after running a file
         if (argc > 2 && string(argv[2]) == "final")

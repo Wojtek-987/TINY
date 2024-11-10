@@ -111,8 +111,27 @@ void Tiny::tokenize_input(const string& input) const {
     tokenizer.tokenize(sterilized_input);
 }
 
-void Tiny::process_token_queue() {
-    // interpret the token queue
+void Tiny::process_token_queue() const { // <- Don't make static. Adjust arguments as necessary, keeping references to Tiny& tiny as first argument
+
+    // (interpret the token queue and generate output -> push output to console)
+
+    // Add Comment functionality
+
+    // Add System Command functionality
+
+
+    // === Update the tiny.last variable to the last VALID int output ===
+
+    // Add Basic Math functionality (accounting for overflow as stated in docs)
+
+    // Add constant and variable creation based on docs
+    // + Assure inline value assignment on creation works ex. "vint x = 5"
+
+    // Add deletion, renaming, and value changing to variables and constants (+ error handling for constants)
+
+    // Add operations between variables and constants (by value substitution, similar to basic math functionality but with preemptive error handling)
+
+    // Check all this works for *.tiny files and the logs.
 }
 
 void Tiny::return_output(const string& value, const OutputType type) const {

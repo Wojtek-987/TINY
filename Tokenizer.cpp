@@ -21,7 +21,7 @@ void Tokenizer::tokenize(const string& line) const {
 
 TokenType Tokenizer::identifyTokenType(const string& token) {
     // Define sets of keywords and operators
-    static const std::unordered_set<std::string> system_keywords = {"hello", "clear", "exit" };
+    static const std::unordered_set<std::string> system_keywords = {"hello", "clear", "exit", "help" };
     static const std::unordered_set<std::string> keywords = {"vint", "cint", "last", "rename", "delete", "comment"};
     static const std::unordered_set<std::string> operators = {"+", "-", "*", "/", "="};
 

@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-void run_io_loop(Tiny& tiny, const string& command = "") {
+void run_io_loop(const Tiny& tiny, const string& command = "") {
     string user_command = tiny.sterilize_input(command);
 
     tiny.prompt_input();
@@ -21,7 +21,7 @@ void run_io_loop(Tiny& tiny, const string& command = "") {
         std::cout << command << std::endl;
     }
 
-    append_to_log(tiny.get_name() + " < " + command, log_file_path, tiny);
+    append_to_log(tiny, tiny.get_name() + " < " + command, log_file_path);
 
     // Process user input
     tiny.tokenize_input(user_command);
@@ -35,13 +35,13 @@ void run_io_loop(Tiny& tiny, const string& command = "") {
     // Show whether input is clean (debug) TEMP
     tiny.return_output(output, OutputType::Output);
 
-    append_to_log(tiny.get_name() + " > " + output, log_file_path, tiny);
+    append_to_log(tiny, tiny.get_name() + " > " + output, log_file_path);
 
     if (user_command == "exit") // TEMP
         tiny.is_running = false;
 }
 
-void run_file(const string& path, Tiny& tiny) {
+void run_file(const Tiny& tiny, const string& path) {
     // Check if the path exists, is a regular file, and has the ".tiny" extension
     if (const fs::path file_path = path; exists(file_path) && is_regular_file(file_path) && file_path.extension() == ".tiny") {
         std::ifstream file(path);
