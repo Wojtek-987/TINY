@@ -36,7 +36,7 @@ It then waits for another command. This loop continues until the user enters the
 ---
 
 ### Interpreting a `*.tiny` file:
-Go into the directory where `TINY.exe` is stored. Right-click and select 'Open in Terminal'. Type `TINY.exe "absolute/path/to/your/file.tiny" final`. `TINY.exe` will read the file line-by-line and automatically execute all commands. It's like an automated typing in `TINY.tiny` code. The `final` argument is optional. It will terminate the process after completing file execution. If it's not included, `TINY.exe` will continue to prompt for more commands.
+Go into the directory where `TINY.exe` is stored. Right-click and select 'Open in Terminal'. Type `TINY.exe "path/to/your/file.tiny" final`. `TINY.exe` will read the file line-by-line and automatically execute all commands. It's like an automated typing in `TINY.tiny` code. The `final` argument is optional. It will terminate the process after completing file execution. If it's not included, `TINY.exe` will continue to prompt for more commands.
 
 ---
 
@@ -235,10 +235,12 @@ last
 comment clear memory
 clear
 last
+2 - 4
 
 comment attempt an invalid math operation
 total + b + 5
 
 comment exit the program
-exit
+comment exit
 ```
+Which should output -2. If you run it without the `final` optional argument from the console, the `last` system variable will be `-2`, as that is the output of the file.

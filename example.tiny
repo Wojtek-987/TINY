@@ -39,9 +39,10 @@ last
 comment clear memory
 clear
 last
+2 - 4
 
 comment attempt an invalid math operation
 total + b + 5
 
 comment exit the program
-exit
+comment exit
