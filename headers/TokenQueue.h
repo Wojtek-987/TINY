@@ -2,7 +2,7 @@
 #define TOKENQUEUE_H
 
 #include "../types/Token.h"
-#include <queue>
+#include <deque>
 
 class TokenQueue {
 public:
@@ -14,10 +14,14 @@ public:
 
     [[nodiscard]] bool isEmpty() const;
 
+    [[nodiscard]] size_t size() const;
+
+    void push_front(const Token& token);
+
     void clear();
 
 private:
-    std::queue<Token> tokens;
+    std::deque<Token> tokens;
 };
 
 #endif //TOKENQUEUE_H

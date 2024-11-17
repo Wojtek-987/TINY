@@ -3,6 +3,7 @@
 
 #include "../types/OutputType.h"
 #include "TokenQueue.h"
+#include "VariableManager.h"
 
 
 using std::string;
@@ -17,6 +18,8 @@ private:
     static void greet();
 
     void change_name(const string& new_name);
+
+    mutable VariableManager variableManager;
 
 
 public:

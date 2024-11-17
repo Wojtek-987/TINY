@@ -1,7 +1,7 @@
 #include "headers/TokenQueue.h"
 
 void TokenQueue::push(const Token& token) {
-    tokens.push(token);
+    tokens.push_back(token);
 }
 
 Token TokenQueue::pop() {
@@ -9,7 +9,7 @@ Token TokenQueue::pop() {
         return Token{TokenType::Literal, ""};
     }
     Token frontToken = tokens.front();
-    tokens.pop();
+    tokens.pop_front();
     return frontToken;
 }
 
@@ -24,8 +24,16 @@ bool TokenQueue::isEmpty() const {
     return tokens.empty();
 }
 
+size_t TokenQueue::size() const {
+    return tokens.size();
+}
+
+void TokenQueue::push_front(const Token& token) {
+    tokens.push_front(token);
+}
+
 void TokenQueue::clear() {
     while (!tokens.empty()) {
-        tokens.pop();
+        tokens.pop_front();
     }
 }

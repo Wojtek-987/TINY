@@ -19,4 +19,6 @@ add_executable(TINY main.cpp
         types/Token.h
         Tokenizer.cpp
         headers/Tokenizer.h
+        VariableManager.cpp
+        headers/VariableManager.h
 )

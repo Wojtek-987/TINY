@@ -24,3 +24,15 @@ bool Language::is_clean(const string& line) {
 
     return true;
 }
+
+
+#include <cctype>
+
+bool Language::is_valid_identifier(const std::string& name) {
+    for (const char ch : name) {
+        if (!std::islower(ch)) { // Ensure all characters are lowercase
+            return false;
+        }
+    }
+    return !name.empty(); // Ensure the name is not empty
+}

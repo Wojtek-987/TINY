@@ -6,11 +6,11 @@ using std::string;
 
 class Language {
 public:
-    // Declare the static valid_chars constant
     static const string valid_chars;
 
-    // Declare the is_clean function
     static bool is_clean(const string& line);
+
+    static bool is_valid_identifier(const string& name);
 };
 
 #endif

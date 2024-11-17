@@ -9,11 +9,23 @@
 #include "headers/Logger.h"
 #include "headers/Run_Loop.h"
 #include "headers/Tokenizer.h"
+#include "headers/VariableManager.h"
 
 using std::string;
 using std::cout;
 using std::endl;
 
+
+
+
+#include <charconv>
+
+long long safe_stoll(const std::string& str, bool& success) {
+    long long result = 0;
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), result);
+    success = (ec == std::errc());
+    return result;
+}
 
 
 class ColourText {
@@ -119,15 +131,13 @@ void Tiny::tokenize_input(const string& input) const {
 }
 
 string Tiny::process_token_queue() const {
-
-    if(Tokenizer::queue.isEmpty()) {
-        this->return_output("Received empty token queue.", OutputType::Info);
+    if (Tokenizer::queue.isEmpty()) {
+        const string error = "Received empty token queue.";
+        this->return_output(error, OutputType::Info);
         return "";
     }
 
     const Token token = Tokenizer::queue.peek();
-
-
 
     // === Add Comment functionality ===
     if (token.type == TokenType::Keyword && token.value == "comment") {
@@ -143,6 +153,450 @@ string Tiny::process_token_queue() const {
         return comment_text;
     }
 
+    // === Deleting variables and constants ===
+    if (token.type == TokenType::Keyword && token.value == "delete") {
+        Tokenizer::queue.pop(); // Remove "delete"
+
+        if (Tokenizer::queue.isEmpty() || Tokenizer::queue.peek().type != TokenType::Identifier) {
+            const string error = "Error: Missing or invalid identifier to delete.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+
+        if (string name = Tokenizer::queue.pop().value; variableManager.remove(name)) {
+            this->return_output(name + " -> #", OutputType::Info);
+            return name + " deleted";
+        } else {
+            const string error = "Error: Identifier '" + name + "' does not exist.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+    }
+
+    // === Renaming variables and constants using 'rename' keyword ===
+    if (token.type == TokenType::Keyword && token.value == "rename") {
+        Tokenizer::queue.pop(); // Remove 'rename'
+
+        // Get the old name
+        if (Tokenizer::queue.isEmpty() || Tokenizer::queue.peek().type != TokenType::Identifier) {
+            const string error = "Error: Missing or invalid identifier to rename.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        string oldName = Tokenizer::queue.pop().value;
+
+        // Check for '='
+        if (Tokenizer::queue.isEmpty() || Tokenizer::queue.peek().value != "=") {
+            const string error = "Error: Missing '=' after identifier.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        Tokenizer::queue.pop(); // Remove '='
+
+        // Get the new name
+        if (Tokenizer::queue.isEmpty() || Tokenizer::queue.peek().type != TokenType::Identifier) {
+            const string error = "Error: Missing or invalid new identifier.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        string newName = Tokenizer::queue.pop().value;
+
+        // Check for extra tokens
+        if (!Tokenizer::queue.isEmpty()) {
+            const string error = "Error: Unexpected input after renaming command.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+
+        // Perform renaming
+        if (!variableManager.exists(oldName)) {
+            const string error = "Error: Identifier '" + oldName + "' does not exist.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        if (variableManager.exists(newName)) {
+            const string error = "Error: Identifier '" + newName + "' already exists.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        if (variableManager.rename(oldName, newName)) {
+            long long value;
+            if (!variableManager.getValue(newName, value)) {
+                const string error = "Error: Could not retrieve value for identifier '" + newName + "'.";
+                this->return_output(error, OutputType::Error);
+                Tokenizer::queue.clear();
+                return error;
+            }
+            VariableType varType;
+            if (!variableManager.getType(newName, varType)) {
+                const string error = "Error: Could not retrieve type for identifier '" + newName + "'.";
+                this->return_output(error, OutputType::Error);
+                Tokenizer::queue.clear();
+                return error;
+            }
+
+            string output = oldName + " -> " + newName + (varType == VariableType::Variable ? " = " : ": ") + std::to_string(value);
+            this->return_output(output, OutputType::Info);
+            return output;
+        } else {
+            const string error = "Error: Could not rename identifier '" + oldName + "' to '" + newName + "'.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+    }
+
+    // === Variable and Constant Creation ===
+    if (token.type == TokenType::Keyword && (token.value == "vint" || token.value == "cint")) {
+        bool is_variable = (token.value == "vint");
+        Tokenizer::queue.pop(); // Remove "vint" or "cint"
+
+        // Validate identifier
+        if (Tokenizer::queue.isEmpty() || Tokenizer::queue.peek().type != TokenType::Identifier) {
+            const string error = "Error: Missing or invalid identifier.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        string name = Tokenizer::queue.pop().value;
+
+        if (!Language::is_valid_identifier(name)) {
+            const string error = "Error: Invalid identifier '" + name + "'.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+
+        // Check for '='
+        if (Tokenizer::queue.isEmpty() || Tokenizer::queue.peek().value != "=") {
+            const string error = "Error: Missing '=' after identifier.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+        Tokenizer::queue.pop(); // Remove '='
+
+        // Validate value
+        if (Tokenizer::queue.isEmpty()) {
+            const string error = "Error: Missing value after '='.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+
+        const Token valueToken = Tokenizer::queue.pop();
+        long long value;
+
+        // Assigning 'last'
+        if (valueToken.type == TokenType::Keyword && valueToken.value == "last") {
+            value = this->last;
+        }
+        // Assigning a literal value
+        else if (valueToken.type == TokenType::Literal) {
+            bool success;
+            long long tempValue = safe_stoll(valueToken.value, success);
+            if (!success) {
+                const string error = "Error: Invalid numeric value '" + valueToken.value + "'.";
+                this->return_output(error, OutputType::Error);
+                return error;
+            }
+            if (tempValue < -2147483648LL || tempValue > 2147483647LL) {
+                const string error = "Error: Value out of range for '" + valueToken.value + "'.";
+                this->return_output(error, OutputType::Error);
+                Tokenizer::queue.clear();
+                return error;
+            }
+            value = static_cast<int>(tempValue);
+        } else {
+            const string error = "Error: Invalid value after '='.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+
+        // Add variable or constant
+        if (variableManager.add(name, is_variable ? VariableType::Variable : VariableType::Constant, value)) {
+            string output = is_variable ? (name + " = " + std::to_string(value)) : (name + ": " + std::to_string(value));
+            this->return_output(output, OutputType::Info);
+            return output;
+        } else {
+            const string error = "Error: Could not create " + string(is_variable ? "variable" : "constant") + " '" + name + "'.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+    }
+
+    // === Output variable/constant value when only its name is entered ===
+    if (token.type == TokenType::Identifier && Tokenizer::queue.size() == 1) {
+        string name = token.value;
+        Tokenizer::queue.pop(); // Remove the identifier
+
+        if (long long value; variableManager.getValue(name, value)) {
+            if (VariableType varType; variableManager.getType(name, varType)) {
+                string output = name + (varType == VariableType::Variable ? " = " : ": ") + std::to_string(value);
+                this->return_output(output, OutputType::Info);
+                this->last = value;
+                return output;
+            } else {
+                const string error = "Error: Could not retrieve type for identifier '" + name + "'.";
+                this->return_output(error, OutputType::Error);
+                Tokenizer::queue.clear();
+                return error;
+            }
+        } else {
+            const string error = "Error: Identifier '" + name + "' does not exist.";
+            this->return_output(error, OutputType::Error);
+            Tokenizer::queue.clear();
+            return error;
+        }
+    }
+
+    // === Output 'last' value when only 'last' is entered ===
+    if (token.type == TokenType::Keyword && token.value == "last" && Tokenizer::queue.size() == 1) {
+        Tokenizer::queue.pop();
+        this->return_output(std::to_string(this->last), OutputType::Output);
+        return std::to_string(this->last);
+    }
+
+    // === Handle potential variable assignment or math expression starting with identifier ===
+    if (token.type == TokenType::Identifier) {
+        string identifier = token.value;
+        Tokenizer::queue.pop(); // Remove the identifier
+
+        if (Tokenizer::queue.isEmpty()) {
+            // Only identifier provided; output its value
+            if (long long value; variableManager.getValue(identifier, value)) {
+                if (VariableType varType; variableManager.getType(identifier, varType)) {
+                    string output = identifier + (varType == VariableType::Variable ? " = " : ": ") + std::to_string(value);
+                    this->return_output(output, OutputType::Info);
+                    return output;
+                } else {
+                    const string error = "Error: Could not retrieve type for identifier '" + identifier + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+            } else {
+                const string error = "Error: Identifier '" + identifier + "' does not exist.";
+                this->return_output(error, OutputType::Error);
+                return error;
+            }
+        }
+
+        // Peek at the next token to decide what to do
+        const Token nextToken = Tokenizer::queue.peek();
+
+        if (nextToken.value == "=") {
+            // === Variable Assignment ===
+            Tokenizer::queue.pop(); // Remove '='
+
+            if (Tokenizer::queue.isEmpty()) {
+                const string error = "Error: Missing value after '='.";
+                this->return_output(error, OutputType::Error);
+                return error;
+            }
+
+            const Token valueToken = Tokenizer::queue.pop();
+
+            long long value;
+
+            // Assigning 'last' to variables
+            if (valueToken.type == TokenType::Keyword && valueToken.value == "last") {
+                value = this->last;
+            }
+            // Assigning from another variable/constant
+            else if (valueToken.type == TokenType::Identifier) {
+                long long sourceValue;
+                if (!variableManager.getValue(valueToken.value, sourceValue)) {
+                    const string error = "Error: Identifier '" + valueToken.value + "' does not exist.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+                value = sourceValue;
+            }
+            // Assigning a literal value
+            else if (valueToken.type == TokenType::Literal) {
+                bool success;
+                long long tempValue = safe_stoll(valueToken.value, success);
+                if (!success) {
+                    const string error = "Error: Invalid numeric value '" + valueToken.value + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+                if (tempValue < -2147483648LL || tempValue > 2147483647LL) {
+                    const string error = "Error: Value out of range for '" + valueToken.value + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+                value = static_cast<int>(tempValue);
+            } else {
+                const string error = "Error: Invalid value after '='.";
+                this->return_output(error, OutputType::Error);
+                return error;
+            }
+
+            // Perform variable assignment
+            if (variableManager.exists(identifier)) {
+                VariableType targetType;
+                if (!variableManager.getType(identifier, targetType)) {
+                    const string error = "Error: Could not retrieve type for identifier '" + identifier + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+                if (targetType == VariableType::Constant) {
+                    const string error = "Error: Cannot modify constant '" + identifier + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+
+                if (variableManager.set(identifier, value)) {
+                    string output = identifier + " = " + std::to_string(value);
+                    this->return_output(output, OutputType::Info);
+                    return output;
+                } else {
+                    const string error = "Error: Failed to update variable '" + identifier + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+            } else {
+                // Variable does not exist, create it
+                if (variableManager.add(identifier, VariableType::Variable, value)) {
+                    string output = identifier + " = " + std::to_string(value);
+                    this->return_output(output, OutputType::Info);
+                    return output;
+                } else {
+                    const string error = "Error: Could not create variable '" + identifier + "'.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+            }
+        } else if (nextToken.type == TokenType::Operator) {
+            // === Math Expression Starting with Identifier ===
+            // Push back the identifier to the queue
+            Tokenizer::queue.push_front(token);
+            // Proceed to math expression handling
+        } else {
+            const string error = "Error: Unexpected token '" + nextToken.value + "'.";
+            this->return_output(error, OutputType::Error);
+            return error;
+        }
+    }
+
+    // === Add Basic Math functionality ===
+    if (Tokenizer::queue.size() >= 1) {
+        Token firstToken = Tokenizer::queue.peek();
+
+        if (firstToken.type == TokenType::Literal || firstToken.type == TokenType::Keyword || firstToken.type == TokenType::Identifier) {
+            // Proceed with math expression handling as before
+            // === Math Expression Handling ===
+            if (Tokenizer::queue.size() >= 3) {
+                // Get the first operand
+                Token operand1Token = Tokenizer::queue.pop();
+                long long num1;
+                if (operand1Token.type == TokenType::Keyword && operand1Token.value == "last") {
+                    num1 = this->last;
+                } else if (operand1Token.type == TokenType::Identifier) {
+                    long long value;
+                    if (!variableManager.getValue(operand1Token.value, value)) {
+                        const string error = "Error: Identifier '" + operand1Token.value + "' does not exist.";
+                        this->return_output(error, OutputType::Error);
+                        return error;
+                    }
+                    num1 = value;
+                } else {
+                    bool success;
+                    num1 = safe_stoll(operand1Token.value, success);
+                    if (!success) {
+                        const string error = "Error: Invalid numeric value '" + operand1Token.value + "'.";
+                        this->return_output(error, OutputType::Error);
+                        return error;
+                    }
+                }
+
+                // Get the operator
+                Token operatorToken = Tokenizer::queue.pop();
+                if (operatorToken.type != TokenType::Operator) {
+                    const string error = "Error: Missing operator!";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+                string operator_symbol = operatorToken.value;
+
+                // Get the second operand
+                Token operand2Token = Tokenizer::queue.pop();
+                long long num2;
+                if (operand2Token.type == TokenType::Keyword && operand2Token.value == "last") {
+                    num2 = this->last;
+                } else if (operand2Token.type == TokenType::Identifier) {
+                    long long value;
+                    if (!variableManager.getValue(operand2Token.value, value)) {
+                        const string error = "Error: Identifier '" + operand2Token.value + "' does not exist.";
+                        this->return_output(error, OutputType::Error);
+                        return error;
+                    }
+                    num2 = value;
+                } else {
+                    bool success;
+                    num2 = safe_stoll(operand2Token.value, success);
+                    if (!success) {
+                        const string error = "Error: Invalid numeric value '" + operand2Token.value + "'.";
+                        this->return_output(error, OutputType::Error);
+                        return error;
+                    }
+                }
+
+                // Perform the operation
+                long long result = 0;
+                if (operator_symbol == "+") {
+                    result = num1 + num2;
+                } else if (operator_symbol == "-") {
+                    result = num1 - num2;
+                } else if (operator_symbol == "*") {
+                    result = num1 * num2;
+                } else if (operator_symbol == "/") {
+                    if (num2 == 0) {
+                        const string error = "Error: Division by zero!";
+                        this->return_output(error, OutputType::Error);
+                        return error;
+                    }
+                    result = num1 / num2; // Integer division
+                } else {
+                    const string error = "Error: Invalid Operator!";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+
+                // Check for overflow/underflow
+                if (result < -2147483648LL || result > 2147483647LL) {
+                    const string error = "Error: Overflow or underflow detected!";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+
+                // Update 'last' and output the result
+                this->last = static_cast<int>(result);
+                this->return_output(std::to_string(this->last), OutputType::Output);
+
+                // Check for unexpected extra tokens after the operation
+                if (!Tokenizer::queue.isEmpty()) {
+                    const string error = "Error: Unexpected input after math operation.";
+                    this->return_output(error, OutputType::Error);
+                    return error;
+                }
+
+                return std::to_string(this->last);
+            }
+
+        }
+    }
 
 
     // === Add System Command functionality ===
@@ -156,38 +610,36 @@ string Tiny::process_token_queue() const {
             }
         }
 
-
-
         // Implement the clear command
         if (token.value == "clear") {
             Tokenizer::queue.pop();
             if (Tokenizer::queue.isEmpty()) {
-
                 this->last = 0;
 
                 if (const bool is_cleared = clear_log_file(*this, log_file_path); !is_cleared) {
-                    this-> return_output("Counldn't clear logs!", OutputType::Error);
+                    const string error = "Error: Couldn't clear logs!";
+                    this->return_output(error, OutputType::Error);
+                    Tokenizer::queue.clear();
+                    return error;
                 }
 
-                // TEMP clear all variables and constants
+                // Clear all variables and constants
+                variableManager.clear();
 
                 this->return_output("Cleared state!", OutputType::Info);
                 return "Cleared";
             }
         }
 
-
-
         // Implement the exit command
         if (token.value == "exit") {
             Tokenizer::queue.pop();
             if (Tokenizer::queue.isEmpty()) {
+                // Set is_running to false to exit the interpreter
                 this->is_running = false;
                 return "Terminated";
             }
         }
-
-
 
         // Implement the help command
         if (token.value == "help") {
@@ -196,11 +648,11 @@ string Tiny::process_token_queue() const {
                 // Open browser link
                 const string url = "https://github.com/Wojtek-987/TINY"; // TEMP
                 #ifdef _WIN32
-                    std::string command = "start " + url;
+                    string command = "start " + url;
                 #elif __APPLE__
-                    std::string command = "open " + url;
+                    string command = "open " + url;
                 #elif __linux__
-                    std::string command = "xdg-open " + url;
+                    string command = "xdg-open " + url;
                 #else
                     #error "Unsupported platform"
                 #endif
@@ -209,37 +661,24 @@ string Tiny::process_token_queue() const {
                 return "Online help";
             }
         }
+    }
 
-
-        // === Unexpected token ===
-        string error = "Unexpected token: " + Tokenizer::queue.peek().value;
+    // === Unexpected token ===
+    if (!Tokenizer::queue.isEmpty() && !Tokenizer::queue.peek().value.empty()) {
+        const string error = "Unexpected token: " + Tokenizer::queue.peek().value;
         this->return_output(error, OutputType::Error);
         Tokenizer::queue.clear();
         return error;
     }
 
-
-
-    // === REMINDER: Update the tiny.last variable to the last VALID int output ===
-
-
-    // Add Basic Math functionality (accounting for overflow as stated in docs)
-
-    // Add constant and variable creation based on docs
-    // + Assure inline value assignment on creation works ex. "vint x = 5"
-
-    // Add deletion, renaming, and value changing to variables and constants (+ error handling for constants)
-
-    // Add operations between variables and constants (by value substitution, similar to basic math functionality but with preemptive error handling)
-
-    // Check all this works for *.tiny files and the logs.
-
-
     // TEMP - debug
-    this->return_output("other", OutputType::Info);
+    this->return_output("Uncaught exception [Debug]", OutputType::Info);
     Tokenizer::queue.clear();
-    return "other";
+    return "Uncaught exception [TEMP Debug Info]";
 }
+
+
+
 
 void Tiny::return_output(const string& value, const OutputType type) const {
 
