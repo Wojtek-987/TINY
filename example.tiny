@@ -1,0 +1,47 @@
+comment tiny script showcase
+comment hello world
+hello
+
+comment create variables and constants
+vint a = 10
+cint b = 5
+
+comment perform a math operation
+a + b
+
+comment assign last to a new variable
+vint c = last
+
+comment output the value of c
+c
+
+comment change the value of a
+a = 20
+
+comment subtract b from a
+a - b
+
+comment rename c to total
+rename c = total
+
+comment output total
+total
+
+comment delete a variable
+delete a
+
+comment attempt to access deleted variable
+a
+
+comment use last keyword
+last
+
+comment clear memory
+clear
+last
+
+comment attempt an invalid math operation
+total + b + 5
+
+comment exit the program
+exit

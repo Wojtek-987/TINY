@@ -11,6 +11,13 @@ Files with the `*.tiny` extension are written in the TINY programming language. 
 
 ---
 
+## Before you use
+If you encounter any problems running `TINY.exe`:
+
+Download the `DEPENDENCY LIBRARIES` folder and extract those files directly into the directory in which `TINY.exe` is located.
+
+---
+
 ## TINY.exe docs
 
 `TINY.exe` takes one line of `TINY.tiny` code and outputs one of the following:

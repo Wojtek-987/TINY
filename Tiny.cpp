@@ -581,16 +581,17 @@ string Tiny::process_token_queue() const {
                     return error;
                 }
 
-                // Update 'last' and output the result
-                this->last = static_cast<int>(result);
-                this->return_output(std::to_string(this->last), OutputType::Output);
-
                 // Check for unexpected extra tokens after the operation
                 if (!Tokenizer::queue.isEmpty()) {
                     const string error = "Error: Unexpected input after math operation.";
                     this->return_output(error, OutputType::Error);
+                    Tokenizer::queue.clear();
                     return error;
                 }
+
+                // Update 'last' and output the result
+                this->last = static_cast<int>(result);
+                this->return_output(std::to_string(this->last), OutputType::Output);
 
                 return std::to_string(this->last);
             }
