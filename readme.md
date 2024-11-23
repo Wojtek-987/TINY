@@ -7,7 +7,7 @@ Tiny is a JIT interpreter coded in C++ for a custom basic arithmetic programming
 Files with the `*.tiny` extension are written in the TINY programming language. This language allows for basic arithmetic, assigning numerical values to variables `vint` and constants `cint`, and direct commands to the TINY interpreter (e.g., `exit`).
 
 ### Showcase:
-[YouTube Link](https://www.youtube.com/@wojtek987)
+[YouTube Showcase](https://youtu.be/ws9pZa54BAw)
 
 ---
 
